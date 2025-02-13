@@ -2,7 +2,7 @@ import random
 
 students = [
     "marcos", "aidan", "shahood", "ryan", "muntag", "chris", "mason", "leo", "nathan", "gavin", "jaiden", "daybean",
-    "asher", "supabigsteve", "sean", "antonio", "carrell", "jackson", "jacob", "chu"
+    "asher", "LeBron Raymone James", "sean", "antonio", "carrell", "jackson", "jacob", "chu"
 ]
 
 restrictions = set()
@@ -16,14 +16,27 @@ while True:
         
         print("You can add up to 2 pairs of students who can't work together")
         qstinput = input("Do you want restrictions for students who can't work together? (y/n) \n")
-
+        
         restriction_count = 0
+        
+        
         while qstinput == 'y' and restriction_count < 2:
             rst1input = input("Enter the name of the first student: ")
             CAPrstinput1 = rst1input.capitalize()
+            
+            if rst1input in students:
+                break
+            else:
+                print("Invalid input.")
+            
             rst2input = input("Enter the name of the student that can't work with " +CAPrstinput1+ ": ")
             CAPrstinput2 = rst2input.capitalize()
-
+            
+            if rst2input in students:
+                break
+            else:
+                print("Invalid input.")
+            
             restrictions.add((CAPrstinput1, CAPrstinput2))
             print("Restriction added: " +CAPrstinput1+ " and "+CAPrstinput2+ " can't work together")
             restriction_count += 1
@@ -40,27 +53,38 @@ while True:
 
 random.shuffle(students)
 
-def create_groups(students, group_size, restrictions):
-    groups = []
-    while len(students) >= group_size:
-        group = students[:group_size]
-        students = students[group_size:]
+groups = []
 
-        while any(pair in restrictions or (pair[1], pair[0]) in restrictions for pair in [(group[i], group[j]) for i in range(len(group)) for j in range(i+1, len(group))]):
-            random.shuffle(students)
-            group = students[:group_size]
-            students = students[group_size:]
+while len(students) >= int(userinput):
+    group = students[:int(userinput)]
+    students = students[int(userinput):]
 
+    #check if any pair has a restriction
+    pair_restricted = False
+    for i in range(len(group)):
+        for j in range(i+1, len(group)):
+            for restriction in restrictions:
+                #check if the pair matches any restriction
+                if (group[i] == restriction[0] and group[j] == restriction[1]) or (group[i] == restriction[1] and group[j] == restriction[0]):
+                    pair_restricted = True
+                    break
+            if pair_restricted:
+                break
+        if pair_restricted:
+            break
+
+    if not pair_restricted:
         groups.append(group)
+    else:
+        random.shuffle(students) 
+        #reshuffle students if theres a restriction
 
-    if len(students) > 0:
-        groups.append(students)
-
-    return groups
-
-group_size = int(userinput)
-groups = create_groups(students, group_size, restrictions)
+if len(students) > 0:
+    groups.append(students)
 
 print("\nThe groups are:")
-for i, group in enumerate(groups):
-    print(f"Group {i+1}: {group}")
+#added a counter for group number
+i = 1
+for group in groups:
+    print("Group ",i,": ",group)
+    i += 1
